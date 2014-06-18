@@ -1,0 +1,94 @@
+<% if @view_in_config && @erb_code %>
+  <%= render inline: ERB.new(@erb_code).result(binding) %>
+  
+<% else %>
+<div id="main_body">
+<h4><%=@title %></h4>
+
+<p>
+  <b><%= t('Order Date') %></b>
+  <%= @order.order_date.strftime("%Y/%m/%d") %>
+</p>
+
+<p>
+  <b><%= t('Customer') %></b>
+  <%= @order.customer.name %>
+</p>
+<p>
+  <b><%= t('Ad Resource') %></b>
+  <%= @order.resource.name %>
+</p>
+<p>
+  <b><%= t('Order Detail') %></b>
+  <%= @order.order_detail %>
+</p>
+<p>
+  <b><%= t('Order Total($)')  %></b>
+  <%= number_with_precision(@order.order_total, :precision => 2) %>
+</p>
+<p>
+  <b><%= t('Unit Price($)')  %></b>
+  <%= number_with_precision(@order.unit_price, :precision => 2) if @order.unit_price.present? %>
+</p>
+<p>
+  <b><%= t('Other Charge($)')  %></b>
+  <%= number_with_precision(@order.other_charge, :precision => 2) if @order.other_charge.present? %>
+</p>
+<p>
+  <b><%= t('Tax($)')  %></b>
+  <%= number_with_precision(@order.tax, :precision => 2) if @order.tax.present? %>
+</p>
+<p>
+  <b><%= t('Standard Price($)')  %></b>
+  <%= number_with_precision(@order.standard_price, :precision => 2) if @order.standard_price.present? %>
+</p>
+<p>
+  <b><%= t('Order Start Date') %></b>
+  <%= @order.order_start_date.strftime("%Y/%m/%d") if @order.order_start_date.present? %>
+</p>
+<p>
+  <b><%= t('Order End Date') %></b>
+  <%= @order.order_end_date.strftime("%Y/%m/%d") if @order.order_end_date.present? %>
+</p>
+<p>
+  <b><%= t('Sales') %></b>
+  <%= @order.sales.name if @order.sales_id.present? %>
+</p>
+<p>
+  <b><%= t('GM Approved By') %>:</b>
+  <%= Authentify::User.find_by_id(@order.gm_approved_by_id).name if @order.gm_approved_by_id.present? %>
+</p>
+<p>
+  <b><%= t('GM Approved') %>:</b>
+  <%= @order.gm_approved ? t('Yes') : t('No') %>
+</p>
+<p>
+  <b><%= t('GM Approved Date') %>:</b>
+  <%= @order.gm_approve_date.strftime("%Y/%m/%d") if @order.gm_approve_date.present? %>
+</p>
+<p>
+  <b><%= t('WF State') %>:</b>
+  <%= t(@order.wf_state.humanize.titleize) if @order.wf_state.present? %>
+</p>
+<p>
+  <b><%= t('Last Updated By') %>:</b>
+  <%= @order.last_updated_by.name if @order.last_updated_by_id.present? %>
+</p>
+<p>
+<% if @order.wf_state.present? %>
+  <b><%=t('Workflow History')%>:</b>
+  <% StateMachineLogx::Log.where('resource_id = ? AND resource_string = ?', @order.id, params[:controller]).order('created_at DESC').each do |t| %>
+    <li><%= t.created_at.strftime("%Y/%m/%d") %>,&nbsp; <%= t.action_by_name %>,&nbsp; <%=t(t.from)%>,&nbsp; <%=t(t.event.capitalize) %>,&nbsp; <%=t(t.to)%>,&nbsp;<%= t.comment %> </li>
+  <% end %>
+<% end %>	
+
+	<table class="table table-striped">
+	  <tr>
+	    <th>
+  			<%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :id => 'close', :class => BUTTONS_CLS['action'] %>
+          </th>
+	  </tr>
+	</table>     	
+</div>
+
+<% end %>

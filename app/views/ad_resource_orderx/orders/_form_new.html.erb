@@ -1,0 +1,27 @@
+<% if @view_in_config && @erb_code %>
+  <%= render inline: @erb_code %>
+  
+<% else %>
+<%= simple_form_for @order do |f| %>    
+
+  <%= f.input :order_date, :label => t("Order Date"), :as => :string %> 
+  <%#= f.input :customer_name_autocomplete, :input_html => { data: {autocomplete_source: kustomerx.autocomplete_customers_path}}, :placeholder => t("Enter keyword"), :label => t("Customer") if @customer.blank? %>
+  <%= f.input :customer_id, :label => t('Customer'), :collection => AdResourceOrderx.customer_class.order('id'), :include_blank => true %>
+  <%= f.input :resource_id, :label => t('Ad Resource'), :collection => AdResourceOrderx.resource_class.where(:in_service => true).order('id'), :include_blank => true %>
+  <%= f.input :order_total, :label => t("Order Total($)") %>
+  <%= f.input :unit_price, :label => t("Unit Price($)") %>
+  <%= f.input :other_charge, :label => t("Other Charge($)") %>
+  <%= f.input :tax, :label => t("Tax($)") %> 
+  <%= f.input :customer_po, :label => t("Customer PO#") %>
+  <%= f.input :standard_price, :label => t("Standard Price($)") %>
+  <%= f.input :order_detail, :label => t("Order Detail"), :input_html => {:rows => 3} %>
+  <%= f.input :order_start_date, :label => t("Start Date"), :as => :string %> 
+  <%= f.input :order_end_date, :label => t("End Date"), :as => :string %> 
+  <%= f.input :sales_id, :label => t('Sales'), :collection => Authentify::UsersHelper::return_users('sales', 'ad_resource_orderx_orders'), :label_method => :name, :value_method => :id,
+              :include_blank => true %>
+  
+  <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
+  <%= f.button :submit, t('Save') %>  
+<% end %>
+
+<% end %>
