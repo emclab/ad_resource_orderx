@@ -36,6 +36,8 @@ zh-CN:
   Order Date : '下单日期'
   Order Start Date : '订单开始日期'
   Order End Date : '订单结束日期'
+  Start Date : '开始日期'
+  End Date : '结束日期'
   Other Charge($) : '其他费用（￥）'
   Tax($) : '税（￥）'
   Ad Resource : '广告资源'

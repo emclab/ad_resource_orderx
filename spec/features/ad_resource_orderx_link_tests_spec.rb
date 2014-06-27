@@ -94,6 +94,9 @@ describe "LinkTests" do
         :sql_code => "")
       user_access = FactoryGirl.create(:user_access, :action => 'sales', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
+      user_access = FactoryGirl.create(:user_access, :action => 'create_ad_resource_order', :resource =>'commonx_logs', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "")
+      
       
       visit '/'
       #save_and_open_page
@@ -105,6 +108,7 @@ describe "LinkTests" do
       visit orders_path
       save_and_open_page
       task = FactoryGirl.create(:ad_resource_orderx_order,:gm_approved_by_id => nil, :sales_id => @u.id, :customer_id => @cust.id, :resource_id => @res.id)
+      log = FactoryGirl.create(:commonx_log, :resource_name => 'ad_resource_orderx_orders', :resource_id => task.id, :log => 'this is ad resource order log')
       visit orders_path
       save_and_open_page
       page.should have_content('Orders')
@@ -129,6 +133,8 @@ describe "LinkTests" do
       click_link task.id.to_s
       #save_and_open_page
       page.should have_content('Order Info')
+      page.should have_content('this is ad resource order log')
+      click_link 'New Log'
       
       #new
       visit orders_path
