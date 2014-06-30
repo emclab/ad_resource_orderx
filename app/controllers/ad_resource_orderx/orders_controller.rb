@@ -10,6 +10,7 @@ module AdResourceOrderx
       @orders = params[:ad_resource_orderx_orders][:model_ar_r]
       @orders = @orders.where(:customer_id => @customer.id) if @customer
       @orders = @orders.where(:resource_id => @resource.id) if @resource
+      @orders = @orders.where(:id => @order_ids) if @order_ids
       @orders = @orders.page(params[:page]).per_page(@max_pagination)
       @erb_code = find_config_const('order_index_view', 'ad_resource_orderx')
     end
@@ -72,6 +73,7 @@ module AdResourceOrderx
       @customer = AdResourceOrderx.customer_class.find_by_id(AdResourceOrderx::Order.find_by_id(params[:id]).customer_id) if params[:id].present?
       @resource = AdResourceOrderx.resource_class.find_by_id(params[:resource_id]) if params[:resource_id].present?
       @resource = AdResourceOrderx.resource_class.find_by_id(AdResourceOrderx::Order.find_by_id(params[:id]).resource_id) if params[:id].present?
+      @order_ids = params[:order_ids] if params[:order_ids].present?  #should be array
     end
   end
 end

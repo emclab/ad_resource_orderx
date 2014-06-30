@@ -87,6 +87,17 @@ module AdResourceOrderx
         get 'index', {:use_route => :ad_resource_orderx, :customer_id => @cust.id}
         assigns(:orders).should =~ [q]
       end
+      
+      it "should return orders in params order_ids" do
+        user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "AdResourceOrderx::Order.scoped.order('created_at DESC')")
+        session[:user_id] = @u.id
+        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
+        q = FactoryGirl.create(:ad_resource_orderx_order, :resource_id => @res1.id, :customer_id => @cust.id)
+        q1 = FactoryGirl.create(:ad_resource_orderx_order, :resource_id => @res.id, :customer_po => '', :customer_id => @cust1.id)
+        get 'index', {:use_route => :ad_resource_orderx, :order_ids => [q.id, q1.id]}
+        assigns(:orders).should =~ [q, q1]
+      end
     end
   
     describe "GET 'new'" do
