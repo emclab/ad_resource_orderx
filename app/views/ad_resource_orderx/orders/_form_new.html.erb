@@ -5,7 +5,7 @@
 <%= simple_form_for @order do |f| %>    
 
   <%= f.input :order_date, :label => t("Order Date"), :as => :string %> 
-  <%#= f.input :customer_name_autocomplete, :input_html => { data: {autocomplete_source: kustomerx.autocomplete_customers_path}}, :placeholder => t("Enter keyword"), :label => t("Customer") if @customer.blank? %>
+  <%#= f.input :customer_name_autocomplete, :input_html => { data: {autocomplete_source: SUBURI + kustomerx.autocomplete_customers_path}}, :placeholder => t("Enter keyword"), :label => t("Customer") if @customer.blank? %>
   <%= f.input :customer_id, :label => t('Customer'), :collection => AdResourceOrderx.customer_class.order('id'), :include_blank => true %>
   <%= f.input :resource_id, :label => t('Ad Resource'), :collection => AdResourceOrderx.resource_class.where(:in_service => true).order('id'), :include_blank => true %>
   <%= f.input :order_total, :label => t("Order Total($)") %>
