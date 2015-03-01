@@ -14,13 +14,13 @@ AdResourceOrderx::Engine.routes.draw do
     elsif Rails.env.test?
       member do
         get :event_action
-        put :submit
-        put :cso_approve
-        put :cso_reject
-        put :gm_approve
-        put :gm_reject
-        put :gm_rewind
-        put :sign_contract
+        patch :submit
+        patch :cso_approve
+        patch :cso_reject
+        patch :gm_approve
+        patch :gm_reject
+        patch :gm_rewind
+        patch :sign_contract
         
       end
       

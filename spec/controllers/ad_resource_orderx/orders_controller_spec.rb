@@ -1,10 +1,11 @@
-require 'spec_helper'
+require 'rails_helper'
 
 module AdResourceOrderx
-  describe OrdersController do
+  RSpec.describe OrdersController, type: :controller do
+    routes {AdResourceOrderx::Engine.routes}
     before(:each) do
-      controller.should_receive(:require_signin)
-      controller.should_receive(:require_employee)
+      expect(controller).to receive(:require_signin)
+      expect(controller).to receive(:require_employee)
       @pagination_config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'pagination', :argument_value => 30)
     end
     
@@ -57,46 +58,46 @@ module AdResourceOrderx
     describe "GET 'index'" do
       it "returns all orders" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "AdResourceOrderx::Order.scoped.order('created_at DESC')")
+        :sql_code => "AdResourceOrderx::Order.all.order('created_at DESC')")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order)
         q1 = FactoryGirl.create(:ad_resource_orderx_order, :customer_po => '')
-        get 'index', {:use_route => :ad_resource_orderx}
-        assigns(:orders).should =~ [q, q1]
+        get 'index'
+        expect(assigns(:orders)).to match_array([q, q1])
       end
       
       it "should only return the order which belongs to resource id" do       
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "AdResourceOrderx::Order.scoped.order('created_at DESC')")
+        :sql_code => "AdResourceOrderx::Order.all.order('created_at DESC')")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order, :resource_id => @res1.id)
         q1 = FactoryGirl.create(:ad_resource_orderx_order, :resource_id => @res.id, :customer_po => '')
-        get 'index', {:use_route => :ad_resource_orderx, :resource_id => @res.id}
-        assigns(:orders).should =~ [q1]
+        get 'index', {:resource_id => @res.id}
+        expect(assigns(:orders)).to match_array([q1])
       end
       
       it "should only return the order which belongs to customer id" do       
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "AdResourceOrderx::Order.scoped.order('created_at DESC')")
+        :sql_code => "AdResourceOrderx::Order.all.order('created_at DESC')")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order, :resource_id => @res1.id, :customer_id => @cust.id)
         q1 = FactoryGirl.create(:ad_resource_orderx_order, :resource_id => @res.id, :customer_po => '', :customer_id => @cust1.id)
-        get 'index', {:use_route => :ad_resource_orderx, :customer_id => @cust.id}
-        assigns(:orders).should =~ [q]
+        get 'index', {:customer_id => @cust.id}
+        expect(assigns(:orders)).to match_array([q])
       end
       
       it "should return orders in params order_ids" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "AdResourceOrderx::Order.scoped.order('created_at DESC')")
+        :sql_code => "AdResourceOrderx::Order.all.order('created_at DESC')")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order, :resource_id => @res1.id, :customer_id => @cust.id)
         q1 = FactoryGirl.create(:ad_resource_orderx_order, :resource_id => @res.id, :customer_po => '', :customer_id => @cust1.id)
-        get 'index', {:use_route => :ad_resource_orderx, :order_ids => [q.id, q1.id]}
-        assigns(:orders).should =~ [q, q1]
+        get 'index', {:order_ids => [q.id, q1.id]}
+        expect(assigns(:orders)).to match_array([q, q1])
       end
     end
   
@@ -106,8 +107,8 @@ module AdResourceOrderx
         :sql_code => "")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
-        get 'new', {:use_route => :ad_resource_orderx}
-        response.should be_success
+        get 'new'
+        expect(response).to be_success
       end
     end
   
@@ -118,8 +119,8 @@ module AdResourceOrderx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.attributes_for(:ad_resource_orderx_order)
-        get 'create', {:use_route => :ad_resource_orderx, :order => q}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
+        get 'create', {:order => q}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
       end
       
       it "should render new with data error" do
@@ -128,8 +129,8 @@ module AdResourceOrderx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.attributes_for(:ad_resource_orderx_order, :order_detail => nil)
-        get 'create', {:use_route => :ad_resource_orderx, :order => q}
-        response.should render_template('new')
+        get 'create', {:order => q}
+        expect(response).to render_template('new')
       end
       
     end
@@ -141,8 +142,8 @@ module AdResourceOrderx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order,:wf_state => '', :sales_id => @u.id)
-        get 'edit', {:use_route => :ad_resource_orderx, :id => q.id}
-        response.should be_success
+        get 'edit', {:id => q.id}
+        expect(response).to be_success
       end
       
       it "should redirect to previous page for an open process" do
@@ -151,8 +152,8 @@ module AdResourceOrderx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order, :wf_state => 'cso_reviewing')  
-        get 'edit', {:use_route => :ad_resource_orderx, :id => q.id}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=NO Update. Record Being Processed!")
+        get 'edit', {:id => q.id}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=NO Update. Record Being Processed!")
       end
     end
   
@@ -163,8 +164,8 @@ module AdResourceOrderx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order)
-        get 'update', {:use_route => :ad_resource_orderx, :id => q.id, :order => {:order_detail => 'for biz trip on 4/20'}}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
+        get 'update', {:id => q.id, :order => {:order_detail => 'for biz trip on 4/20'}}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       end
       
       it "should render edit with data error" do
@@ -173,8 +174,8 @@ module AdResourceOrderx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order)
-        get 'update', {:use_route => :ad_resource_orderx, :id => q.id, :order => {:order_total => nil}}
-        response.should render_template('edit')
+        get 'update', {:id => q.id, :order => {:order_total => nil}}
+        expect(response).to render_template('edit')
       end
     end
   
@@ -185,23 +186,23 @@ module AdResourceOrderx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order, :sales_id => @u.id, :customer_id => @cust.id, :resource_id => @res1.id)
-        get 'show', {:use_route => :ad_resource_orderx, :id => q.id }
-        response.should be_success
+        get 'show', {:id => q.id }
+        expect(response).to be_success
       end
     end
     
     describe "GET 'list open process" do
       it "return open process only" do
         user_access = FactoryGirl.create(:user_access, :action => 'list_open_process', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "AdResourceOrderx::Order.scoped.order('created_at DESC')")        
+        :sql_code => "AdResourceOrderx::Order.all.order('created_at DESC')")        
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:ad_resource_orderx_order, :created_at => 50.days.ago, :wf_state => 'initial_state', :customer_id => @cust.id, :resource_id => @res.id)  #created too long ago to show
         q1 = FactoryGirl.create(:ad_resource_orderx_order, :wf_state => 'gm_reviewing', :customer_po => nil)
         q2 = FactoryGirl.create(:ad_resource_orderx_order, :wf_state => 'initial_state', :customer_id => @cust1.id, :resource_id => @res.id)
         q3 = FactoryGirl.create(:ad_resource_orderx_order, :wf_state => 'rejected', :customer_id => @cust.id, :resource_id => @res1.id)  #wf_state can't be what was defined.
-        get 'list_open_process', {:use_route => :ad_resource_orderx}
-        assigns(:orders).should =~ [q1, q2]
+        get 'list_open_process'
+        expect(assigns(:orders)).to match_array([q1, q2])
       end
     end
   

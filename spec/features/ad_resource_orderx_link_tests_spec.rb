@@ -1,6 +1,6 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe "LinkTests" do
+RSpec.describe "LinkTests", type: :request do
   describe "GET /ad_resource_orderx_link_tests" do
     mini_btn = 'btn btn-mini '
     ActionView::CompiledTemplates::BUTTONS_CLS =
@@ -72,7 +72,7 @@ describe "LinkTests" do
       @cust1 = FactoryGirl.create(:kustomerx_customer, :name => 'new name', :short_name => 'a new one')
       
       user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "AdResourceOrderx::Order.scoped.order('created_at DESC')")
+        :sql_code => "AdResourceOrderx::Order.all.order('created_at DESC')")
       user_access = FactoryGirl.create(:user_access, :action => 'create', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
       user_access = FactoryGirl.create(:user_access, :action => 'update', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
@@ -83,7 +83,7 @@ describe "LinkTests" do
       user_access = FactoryGirl.create(:user_access, :action => 'event_action', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
       user_access = FactoryGirl.create(:user_access, :action => 'list_open_process', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "AdResourceOrderx::Order.scoped.order('created_at DESC')")
+        :sql_code => "AdResourceOrderx::Order.all.order('created_at DESC')")
       user_access = FactoryGirl.create(:user_access, :action => 'submit', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
       user_access = FactoryGirl.create(:user_access, :action => 'gm_approve', :resource =>'ad_resource_orderx_orders', :role_definition_id => @role.id, :rank => 1,
@@ -105,71 +105,80 @@ describe "LinkTests" do
       click_button 'Login'
     end
     it "works! (now write some real specs)" do
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       save_and_open_page
       task = FactoryGirl.create(:ad_resource_orderx_order,:gm_approved_by_id => nil, :sales_id => @u.id, :customer_id => @cust.id, :resource_id => @res.id)
       log = FactoryGirl.create(:commonx_log, :resource_name => 'ad_resource_orderx_orders', :resource_id => task.id, :log => 'this is ad resource order log')
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       save_and_open_page
-      page.should have_content('Orders')
-      page.should have_content('Initial State')  #for workflow
-      page.should have_content('Submit Order')
+      expect(page).to have_content('Orders')
+      expect(page).to have_content('Initial State')  #for workflow
+      expect(page).to have_content('Submit Order')
       click_link 'Edit'
       #save_and_open_page
-      page.should have_content('Update Order')
+      expect(page).to have_content('Update Order')
       #save_and_open_page
       fill_in 'order_order_total', :with => 230
       click_button "Save"
+      visit ad_resource_orderx.orders_path()
+      expect(page).to have_content('230')
       #bad data
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       click_link 'Edit'
+      fill_in 'order_order_total', :with => '229'
       fill_in 'order_order_date', :with => nil
       click_button "Save"
+      visit ad_resource_orderx.orders_path()
+      expect(page).not_to have_content('229')
       #save_and_open_page
       
       #show
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       #save_and_open_page
       click_link task.id.to_s
       #save_and_open_page
-      page.should have_content('Order Info')
-      page.should have_content('this is ad resource order log')
+      expect(page).to have_content('Order Info')
+      expect(page).to have_content('this is ad resource order log')
       click_link 'New Log'
       
       #new
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       click_link 'New Order'
       save_and_open_page
-      page.should have_content('New Order')
+      expect(page).to have_content('New Order')
       #fill_autocomplete('order_customer_name_autocomplete', with: 'customer1')
       fill_in 'order_order_date', :with => '2014-04-11'
-      fill_in 'order_order_total', :with =>  230
+      fill_in 'order_order_total', :with =>  240
       fill_in 'order_order_detail', :with => 'for biz trip'
       select('customer1', :from => 'order_customer_id')
       select('res1', :from => 'order_resource_id')
       select('Test User', :from => 'order_sales_id')
       click_button 'Save'
-      save_and_open_page
+      #save_and_open_page
+      visit ad_resource_orderx.orders_path()
+      expect(page).to have_content('240')
       #bad data
-      visit orders_path()
+      visit ad_resource_orderx.orders_path()
       click_link 'New Order'
       fill_in 'order_order_date', :with => '2014-04-11'
-      fill_in 'order_order_total', :with =>  230
+      fill_in 'order_order_total', :with =>  231
       fill_in 'order_order_detail', :with => ''
       select('customer1', :from => 'order_customer_id')
       select('res1', :from => 'order_resource_id')
       select('Test User', :from => 'order_sales_id')
       click_button 'Save'
-      save_and_open_page
+      #save_and_open_page
+      visit ad_resource_orderx.orders_path()
+      expect(page).not_to have_content('231')
       
     end
     
     it "should create a order with initial stat and submit" do
-      visit orders_path  #allow to redirect after save new below
+      visit ad_resource_orderx.orders_path  #allow to redirect after save new below
       save_and_open_page
       click_link 'New Order'
       save_and_open_page
-      page.should have_content('New Order')
+      expect(page).to have_content('New Order')
       fill_in 'order_order_date', :with => '2014-04-11'
       fill_in 'order_order_total', :with =>  230
       fill_in 'order_order_detail', :with => 'for biz trip'
@@ -177,12 +186,12 @@ describe "LinkTests" do
       select('res1', :from => 'order_resource_id')
       select('Test User', :from => 'order_sales_id')
       click_button 'Save'
-      save_and_open_page
+      #save_and_open_page
       
       #
-      visit orders_path()
+      visit ad_resource_orderx.orders_path()
       save_and_open_page
-      page.should have_content('Submit Order')
+      expect(page).to have_content('Submit Order')
       click_link 'Submit Order'
       save_and_open_page
       fill_in 'order_wf_comment', :with => 'this is first submission'
@@ -192,32 +201,32 @@ describe "LinkTests" do
     
     it "work for workflow from gm_reviewing to approved" do
       task = FactoryGirl.create(:ad_resource_orderx_order, :gm_approved_by_id => @u.id, :wf_state => 'gm_reviewing', :sales_id => @u.id, :customer_id => @cust.id, :resource_id => @res.id)
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       save_and_open_page
-      click_link 'GM Approve'
+      click_link 'Gm Approve'
       save_and_open_page
       fill_in 'order_wf_comment', :with => 'this line tests workflow'
       fill_in 'order_gm_approve_date', :with => Date.today - 2.days
       #save_and_open_page
       click_button 'Save'
       #
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       #save_and_open_page
       click_link 'Open Process'
-      page.should have_content('Orders')
+      expect(page).to have_content('Orders')
       
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       click_link task.id.to_s
       #save_and_open_page
-      page.should have_content('this line tests workflow')
-      page.should have_content((Date.today - 2.days).to_s.gsub('-', '/'))
+      expect(page).to have_content('this line tests workflow')
+      expect(page).to have_content((Date.today - 2.days).to_s.gsub('-', '/'))
     end
     
     it "should validate for workflow" do
       #task = FactoryGirl.create(:ad_resource_orderx_order,:gm_approved_by_id => nil, :wf_state => 'approved', :sales_id => @u.id, :customer_id => @cust.id, :resource_id => @res.id)
       task = FactoryGirl.create(:ad_resource_orderx_order, :gm_approved_by_id => @u.id, :wf_state => 'gm_reviewing', :sales_id => @u.id, :customer_id => @cust.id, :resource_id => @res.id)
-      visit orders_path
-      click_link 'GM Approve'
+      visit ad_resource_orderx.orders_path
+      click_link 'Gm Approve'
       #save_and_open_page
       fill_in 'order_wf_comment', :with => 'this line tests workflow'
       fill_in 'order_gm_approve_date', :with => nil #Date.today - 2.days
@@ -225,10 +234,10 @@ describe "LinkTests" do
       click_button 'Save'
       #
       
-      visit orders_path
+      visit ad_resource_orderx.orders_path
       click_link task.id.to_s
       #save_and_open_page
-      page.should_not have_content('this line tests workflow')
+      expect(page).not_to have_content('this line tests workflow')
     end
   end
 end

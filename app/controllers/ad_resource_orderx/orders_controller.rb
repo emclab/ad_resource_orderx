@@ -2,8 +2,8 @@ require_dependency "ad_resource_orderx/application_controller"
 
 module AdResourceOrderx
   class OrdersController < ApplicationController
-    before_filter :require_employee
-    before_filter :load_parent_record
+    before_action :require_employee
+    before_action :load_parent_record
     
     def index
       @title = t('Orders')
