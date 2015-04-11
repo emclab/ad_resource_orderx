@@ -51,6 +51,9 @@ module AdResourceOrderx
       @res1 = FactoryGirl.create(:ad_resourcex_resource, :name => 'new name')
       @cust = FactoryGirl.create(:kustomerx_customer)
       @cust1 = FactoryGirl.create(:kustomerx_customer, :name => 'new name', :short_name => 'a new one')
+      
+      session[:user_role_ids] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id).user_role_ids
+        
     end
     
     render_views
