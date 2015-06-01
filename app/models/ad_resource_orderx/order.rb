@@ -31,6 +31,7 @@ module AdResourceOrderx
     end
     
     attr_accessor :sales_name, :last_updated_by_name, :customer_name, :resource_name, :wf_comment, :id_noupdate, :wf_state_noupdate, :wf_event
+=begin
     attr_accessible :customer_id, :customer_po, :gm_approved, :gm_approve_date, :gm_approved_by_id, :order_date, :order_detail, :customer_name_autocomplete,
                     :order_end_date, :order_start_date, :order_total, :other_charge, :resource_id, :sales_id, :standard_price, :tax, :unit_price, :wf_state,
                     :as => :role_new
@@ -43,7 +44,7 @@ module AdResourceOrderx
 
     attr_accessible :start_date_s, :end_date_s, :customer_id_s, :sales_id_s, :resource_id_s, :wf_state_s, :gm_approved_s, :time_frame_s,
                   :as => :role_search_stats
-                  
+=end                  
     belongs_to :customer, :class_name => AdResourceOrderx.customer_class.to_s
     belongs_to :resource, :class_name => AdResourceOrderx.resource_class.to_s
     belongs_to :sales, :class_name => 'Authentify::User'

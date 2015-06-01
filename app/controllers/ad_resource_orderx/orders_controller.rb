@@ -22,7 +22,7 @@ module AdResourceOrderx
     end
   
     def create
-      @order = AdResourceOrderx::Order.new(params[:order], :as => :role_new)
+      @order = AdResourceOrderx::Order.new(new_params)
       @order.last_updated_by_id = session[:user_id]
       if @order.save
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
@@ -47,7 +47,7 @@ module AdResourceOrderx
     def update
       @order = AdResourceOrderx::Order.find_by_id(params[:id])
       @order.last_updated_by_id = session[:user_id]
-      if @order.update_attributes(params[:order], :as => :role_update)
+      if @order.update_attributes(edit_params)
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       else
         @erb_code = find_config_const('order_edit_view', 'ad_resource_orderx')
@@ -74,6 +74,17 @@ module AdResourceOrderx
       @resource = AdResourceOrderx.resource_class.find_by_id(params[:resource_id]) if params[:resource_id].present?
       @resource = AdResourceOrderx.resource_class.find_by_id(AdResourceOrderx::Order.find_by_id(params[:id]).resource_id) if params[:id].present?
       @order_ids = params[:order_ids] if params[:order_ids].present?  #should be array
+    end
+    
+    private 
+    def new_params
+      params.require(:order).permit(:customer_id, :customer_po, :gm_approved, :gm_approve_date, :gm_approved_by_id, :order_date, :order_detail, :customer_name_autocomplete,
+                    :order_end_date, :order_start_date, :order_total, :other_charge, :resource_id, :sales_id, :standard_price, :tax, :unit_price, :wf_state)
+    end
+    
+    def edit_params
+      params.require(:order).permit(:customer_id, :customer_po, :gm_approved, :gm_approve_date, :gm_approved_by_id, :order_date, :order_detail, 
+                    :order_end_date, :order_start_date, :order_total, :other_charge, :resource_id, :sales_id, :standard_price, :tax, :unit_price, :wf_state)
     end
   end
 end

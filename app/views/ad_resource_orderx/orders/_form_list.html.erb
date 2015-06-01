@@ -3,6 +3,7 @@
   
 <% else %>
 <div class="pagination"><%= will_paginate models %></div>
+    <h4><%=@title %></h>
     <table class="table table-striped">
 		<tr>
 			<th>#</th>
@@ -30,7 +31,7 @@
 		  	<td><%= r.order_date.strftime("%Y/%m/%d") %></td>
 		  	<td><%= AdResourceOrderx.customer_class.find_by_id(r.customer_id).name if r.customer_id.present? %></td>
 		  	<td><%= AdResourceOrderx.resource_class.find_by_id(r.resource_id).name if r.resource_id %></td>
-		  	<td><%= prt(r, :order_total) %></td>
+		  	<td><%= number_with_precision(prt(r, :order_total), precision: 2, separator: '.') %></td>
 			<td><%= r.order_start_date.strftime("%Y/%m/%d") if r.order_start_date.present? %></td>
 			<td><%= r.order_end_date.strftime("%Y/%m/%d") if r.order_end_date.present? %></td> 
 			<td><%= t(prt(r, :wf_state).humanize.titleize) if r.wf_state.present? %></td>
