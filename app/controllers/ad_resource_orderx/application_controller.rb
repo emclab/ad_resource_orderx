@@ -15,6 +15,8 @@ module AdResourceOrderx
     after_action :delete_session_variable, :only => [:create, :update]   #for parent_record_id & parent_resource in check_access_right
     before_action :view_in_config?
     
+    helper_method :return_users, :return_misc_definitions
+    
     protected
   
     def max_pagination
